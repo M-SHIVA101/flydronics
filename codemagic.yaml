@@ -2,10 +2,12 @@ workflows:
   ios-build:
     name: Build iOS IPA (Capacitor)
     max_build_duration: 60
+    instance_type: mac_mini_m1
     environment:
       node: "18.20.0"
       vars:
         APP_IDENTIFIER: "com.example.flydronics"
+      xcode: latest
     scripts:
       - name: Install node dependencies
         script: |
@@ -22,10 +24,38 @@ workflows:
       - name: Return to project root
         script: |
           cd $CM_PROJECT_DIR
-    # Xcode settings removed from YAML - select Xcode version / runner in Codemagic UI.
-    # Code signing and export settings should be configured in the Codemagic UI for this workflow.
+      - name: Set up code signing settings
+        script: |
+          xcode-project use-profiles
+      - name: Build iOS app
+        script: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive
+          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/IPA -exportOptionsPlist exportOptions.plist
     artifacts:
-      - build/ios/*.ipa
+      - ios/App/build/IPA/*.ipa
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+    cache:
+      cache_paths:
+        - $HOME/.cocoapods
+        - ios/App/Pods
+
+  preview:
+    name: Preview Web App
+    max_build_duration: 30
+    environment:
+      node: "18.20.0"
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm ci
+      - name: Start dev server
+        script: |
+          npm start -- --host 0.0.0.0 &
+          sleep 10
+    preview:
+      port: 5173
+      name: Web Preview
 
 # Notes:
 # - Configure code signing under the Codemagic UI (Automatic signing with Apple ID or upload certificates & provisioning profiles).
