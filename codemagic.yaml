@@ -4,7 +4,6 @@ workflows:
     max_build_duration: 60
     environment:
       node: "18.20.0"
-      xcode: "latest"
       vars:
         APP_IDENTIFIER: "com.example.flydronics"
     scripts:
@@ -31,7 +30,6 @@ workflows:
     publishing:
       email:
         recipients: []
-      -
     artifacts:
       - build/ios/*.ipa
 
