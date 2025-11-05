@@ -22,14 +22,8 @@ workflows:
       - name: Return to project root
         script: |
           cd $CM_PROJECT_DIR
-    xcode:
-      workspace: ios/App/App.xcworkspace
-      scheme: App
-      configuration: Release
-      export_method: app-store
-    publishing:
-      email:
-        recipients: []
+    # Xcode settings removed from YAML - select Xcode version / runner in Codemagic UI.
+    # Code signing and export settings should be configured in the Codemagic UI for this workflow.
     artifacts:
       - build/ios/*.ipa
 
