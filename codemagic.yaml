@@ -1,0 +1,42 @@
+workflows:
+  ios-build:
+    name: Build iOS IPA (Capacitor)
+    max_build_duration: 60
+    environment:
+      node: "18.20.0"
+      xcode: "latest"
+      vars:
+        APP_IDENTIFIER: "com.example.flydronics"
+    scripts:
+      - name: Install node dependencies
+        script: |
+          npm ci
+      - name: Build web assets
+        script: |
+          npm run build
+      - name: Capacitor sync & CocoaPods
+        script: |
+          npx cap sync ios
+          cd ios/App
+          pod repo update || true
+          pod install --project-directory=.
+      - name: Return to project root
+        script: |
+          cd $CM_PROJECT_DIR
+    xcode:
+      workspace: ios/App/App.xcworkspace
+      scheme: App
+      configuration: Release
+      export_method: app-store
+    publishing:
+      email:
+        recipients: []
+      -
+    artifacts:
+      - build/ios/*.ipa
+
+# Notes:
+# - Configure code signing under the Codemagic UI (Automatic signing with Apple ID or upload certificates & provisioning profiles).
+# - If you prefer ad-hoc or enterprise export, change `export_method` above to `ad-hoc` or `enterprise`.
+# - The workflow runs `npm run build`, so if your Capacitor app is set to use a remote `server.url`, you can remove the build step.
+# - Set any required environment variables and secrets (Apple ID, App-specific password, TEAM_ID) in Codemagic UI.
