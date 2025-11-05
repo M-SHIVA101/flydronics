@@ -2,9 +2,21 @@
   "appId": "com.example.flydronics",
   "appName": "Flydronics",
   "webDir": "dist",
+  "server": {
+    "url": "https://flydrohub.netlify.app",
+    "allowNavigation": [
+      "https://flydrohub.netlify.app/*",
+      "https://spendingamount.netlify.app/*"
+    ]
+  },
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": false
+    },
+    "Permissions": {
+      "camera": true,
+      "geolocation": true,
+      "storage": true
     }
   }
 }
